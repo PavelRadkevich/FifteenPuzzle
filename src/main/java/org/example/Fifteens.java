@@ -1,5 +1,6 @@
 package org.example;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -7,10 +8,12 @@ public class Fifteens {
     private final int rows;
     private final int columns;
     private final int[][] fifteens;
-    private int[][] result;
     private int zeroX;
     private int zeroY;
-    private int depth;
+    private final int depth;
+    private final int hashCode;
+    private int distanceToEnd;
+    private int heuristics;
 
     public Fifteens(int[][] f, int depth) {
         fifteens = f;
@@ -25,34 +28,43 @@ public class Fifteens {
                 }
             }
         }
+        this.hashCode = this.hashCode();
 
+    }
+    public ArrayList<Fifteens> getNeighbours() {
+        ArrayList<Fifteens> ret = new ArrayList<>();
+        if (zeroX != rows - 1)
+            ret.add(new Fifteens(swap(zeroX, zeroY, zeroX + 1, zeroY), depth + 1));
+        if (zeroX != 0)
+            ret.add(new Fifteens(swap(zeroX, zeroY, zeroX - 1, zeroY), depth + 1));
+        if (zeroY != columns - 1)
+            ret.add(new Fifteens(swap(zeroX, zeroY, zeroX, zeroY + 1), depth + 1));
+        if (zeroY != 0)
+            ret.add(new Fifteens(swap(zeroX, zeroY, zeroX, zeroY - 1), depth + 1));
+        return ret;
     }
     public Fifteens getNeighbour(String direction) {
         int[][] newFifteen = new int[rows][columns];
         switch (direction) {
-            case "R": {
+            case "R" -> {
                 if (zeroX == rows - 1)
                     return null;
                 newFifteen = swap(zeroX, zeroY, zeroX + 1, zeroY);
-                break;
             }
-            case "L": {
+            case "L" -> {
                 if (zeroX == 0)
                     return null;
                 newFifteen = swap(zeroX, zeroY, zeroX - 1, zeroY);
-                break;
             }
-            case "U": {
+            case "U" -> {
                 if (zeroY == columns - 1)
                     return null;
                 newFifteen = swap(zeroX, zeroY, zeroX, zeroY + 1);
-                break;
             }
-            case "D": {
+            case "D" -> {
                 if (zeroY == 0)
                     return null;
                 newFifteen = swap(zeroX, zeroY, zeroX, zeroY - 1);
-                break;
             }
         }
         return new Fifteens(newFifteen, depth + 1);
@@ -69,28 +81,29 @@ public class Fifteens {
         fift[y2][x2] = fifteens[y1][x1];
         return fift;
     }
+    public void calculateDistance(Fifteens result) throws Exception {
+        int distance = 0;
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                int coordinatesb = findNumber(result.fifteens, fifteens[i][j]);
+                distance += Math.abs(i - coordinatesb / 10) + Math.abs(j - coordinatesb % 10);
+            }
+        }
+        this.distanceToEnd = distance;
+    }
 
-
+    public int findNumber(int[][] fift, int number) throws Exception {
+        for (int i = 0; i < fift.length; i++) {
+            for (int j = 0; j < fift[0].length; j++) {
+                if (fift[i][j] == number) return i * 10 + j;
+            }
+        }
+        throw new Exception("Can't find number in result matrix");
+    }
     public void solveGame(Algorithm a, String acronym) throws Exception {
         Fifteens result = a.Solve(this, acronym);
         System.out.println(Arrays.deepToString(result.fifteens));
     }
-    public int[][] getFifteens() {
-        return fifteens;
-    }
-
-    public int getZeroX() {
-        return zeroX;
-    }
-
-    public int getZeroY() {
-        return zeroY;
-    }
-
-    public int getDepth() {
-        return depth;
-    }
-
     public int getRows() {
         return rows;
     }
@@ -99,32 +112,44 @@ public class Fifteens {
         return columns;
     }
 
-
-    @Override
-    public int hashCode() {
-        //int result = Objects.hash(zeroX, zeroY);
-        int result = 31 + Arrays.hashCode(fifteens[0]);
-        for ( int i = 1; i < rows; i++) {
-            result += Arrays.hashCode(fifteens[i]);
-        }
-        /*System.out.print(Arrays.deepToString(fifteens));
-        System.out.println("    " + result);*/
-        return result;
+    public int getHashCode() {
+        return hashCode;
     }
 
-    /*public int hashCode() {
-        int hash = 0;
-        for (int i = 0; i < rows; i++)
-            for (int j = 0; j < columns; j++)
-                hash = (hash) ^ ( (Math.pow(34,i)+Math.pow(43,j)) * fifteens[i][j]);
-        return hash;
-    }*/
+    public int getDistanceToEnd() {
+        return distanceToEnd;
+    }
 
+    public int getDepth() {
+        return depth;
+    }
+
+    public int getHeuristics() {
+        return heuristics;
+    }
+
+    public void setHeuristics(int heuristics) {
+        this.heuristics = heuristics;
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Fifteens fifteens1)) return false;
-        return rows == fifteens1.rows && columns == fifteens1.columns && zeroX == fifteens1.zeroX && zeroY == fifteens1.zeroY && Arrays.deepEquals(fifteens, fifteens1.fifteens);
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                if (((Fifteens) o).fifteens[i][j] != fifteens[i][j]) return false;
+            }
+        }
+        return rows == fifteens1.rows && columns == fifteens1.columns && zeroX == fifteens1.zeroX && zeroY == fifteens1.zeroY;
     }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(zeroX, zeroY);
+        result = 31 * result + Arrays.deepHashCode(fifteens);
+        return result;
+    }
+
+
 }
