@@ -11,15 +11,20 @@ public class BFS implements Algorithm {
     HashMap<Integer, Fifteens> closed = new HashMap<>();
     Fifteens result = null;
     String[] line = new String[4];
+    int MaxDepth = 0;
     @Override
-    public Fifteens Solve(Fifteens f, String acronym) throws Exception {
+    public Fifteens Solve(Fifteens f, String[] enter) throws Exception {
+        long startTime = System.currentTimeMillis();
         this.result = AlgorithmsHelper.makeResult(f);
         this.hashResult = result.getHashCode();
         ///////////////////////////START////////////////////////////////////////
         if (f.equals(result)) {
+            AlgorithmsHelper.Statistics(f.getDepth(), frontier.values().toArray().length,
+                    closed.values().toArray().length, MaxDepth, startTime - System.currentTimeMillis(),
+                    f.getSolution(), enter);
             return f;
         }
-        line = AlgorithmsHelper.DecodeAcronym(acronym);
+        line = AlgorithmsHelper.DecodeAcronym(enter[1]);
         frontier.put(f.getHashCode(), f);
         while (!frontier.isEmpty()) {
             //////////////////////Get First from Frontier/////////////////////////////////
@@ -31,10 +36,14 @@ public class BFS implements Algorithm {
                 if (neighbour == null) {
                     continue;
                 }
+                if (MaxDepth < neighbour.getDepth()) MaxDepth = neighbour.getDepth();
                 /////////////////Check the result and closed list////////////////////
                 if (!closed.containsKey(neighbour.getHashCode())) {
                     if (neighbour.getHashCode() == hashResult) {
                         if (neighbour.equals(result)) {
+                            AlgorithmsHelper.Statistics(neighbour.getDepth(), frontier.values().toArray().length,
+                                    closed.values().toArray().length, MaxDepth, startTime - System.currentTimeMillis(),
+                                    neighbour.getSolution(), enter);
                             return neighbour;
                         }
                     }
@@ -45,6 +54,9 @@ public class BFS implements Algorithm {
                 } else if (!closed.get(neighbour.getHashCode()).equals(neighbour)) {
                     if (neighbour.getHashCode() == hashResult) {
                         if (neighbour.equals(result)) {
+                            AlgorithmsHelper.Statistics(neighbour.getDepth(), frontier.values().toArray().length,
+                                    closed.values().toArray().length, MaxDepth, startTime - System.currentTimeMillis(),
+                                    neighbour.getSolution(), enter);
                             return neighbour;
                         }
                     }
@@ -55,7 +67,9 @@ public class BFS implements Algorithm {
                 ////////////////////////////END////////////////////////////////////
             }
         }
-        throw new Exception("Puzzle wasn't resolved");
-        //return null;
+        AlgorithmsHelper.Statistics(-1, frontier.values().toArray().length,
+                closed.values().toArray().length, MaxDepth, startTime - System.currentTimeMillis(),
+                "", enter);
+        return null;
     }
 }

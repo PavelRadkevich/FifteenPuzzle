@@ -13,14 +13,19 @@ public class ASTR implements Algorithm{
     HashMap<Integer, Fifteens> closed = new HashMap<>();
     Fifteens result = null;
     String metric = "";
+    int MaxDepth = 0;
     @Override
-    public Fifteens Solve(Fifteens f, String acronym) throws Exception {
+    public Fifteens Solve(Fifteens f, String[] enter) throws Exception {
+        long startTime = System.currentTimeMillis();
         this.result = AlgorithmsHelper.makeResult(f);
         this.hashResult = result.getHashCode();
         if (f.equals(result)) {
+            AlgorithmsHelper.Statistics(f.getDepth(), frontier.values().toArray().length,
+                    closed.values().toArray().length, MaxDepth, startTime - System.currentTimeMillis(),
+                    f.getSolution(), enter);
             return f;
         }
-        metric = acronym;
+        metric = enter[1];
         frontier.put(f.getHashCode(), f);
         sortedF.put(0, f.getHashCode());
         while (!frontier.isEmpty()) {
@@ -35,14 +40,18 @@ public class ASTR implements Algorithm{
             closed.put(actual.getHashCode(), actual);
             //////////Get neighbour and check result////////
             for (Fifteens neighbour : actual.getNeighbours()) {
-                if (hashResult == actual.getHashCode()) {
-                    if (actual.equals(result)) {
-                        return actual;
-                    }
-                }
+                if (MaxDepth < neighbour.getDepth()) MaxDepth = neighbour.getDepth();
                 if (closed.containsKey(neighbour.getHashCode())) {
                     if (closed.get(neighbour.getHashCode()).equals(neighbour)) {
                         continue;
+                    }
+                }
+                if (hashResult == neighbour.getHashCode()) {
+                    if (neighbour.equals(result)) {
+                        AlgorithmsHelper.Statistics(neighbour.getDepth(), frontier.values().toArray().length,
+                                closed.values().toArray().length, MaxDepth, startTime - System.currentTimeMillis(),
+                                neighbour.getSolution(), enter);
+                        return neighbour;
                     }
                 }
                 //////Calcualte heuristic/////////
@@ -71,8 +80,10 @@ public class ASTR implements Algorithm{
                 }
             }
         }
-        throw new Exception("Puzzle wasn't resolved");
-        //return null;
+        AlgorithmsHelper.Statistics(-1, frontier.values().toArray().length,
+                closed.values().toArray().length, MaxDepth, startTime - System.currentTimeMillis(),
+                f.getSolution(), enter);
+        return null;
 
     }
 }

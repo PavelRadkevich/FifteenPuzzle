@@ -1,6 +1,9 @@
 package org.example;
 
+import static org.example.Files.WriteResultFile;
+
 public class AlgorithmsHelper {
+
     public static Fifteens makeResult(Fifteens f) {
         int rows = f.getRows();
         int columns = f.getColumns();
@@ -13,7 +16,7 @@ public class AlgorithmsHelper {
             }
         }
         result[rows - 1][columns - 1] = 0;
-        return new Fifteens(result, 0);
+        return new Fifteens(result, 0, "");
     }
     public static String[] DecodeAcronym(String acronym) {
         String[] line = new String[4];
@@ -30,4 +33,9 @@ public class AlgorithmsHelper {
         }
         return retline;
     }
+
+    public static void Statistics (int DZR, int LSO , int LSP, int MOGR, long CTPO, String Solution, String[] enter) {
+        WriteResultFile(DZR, Solution, enter[3]);
+    }
+
 }

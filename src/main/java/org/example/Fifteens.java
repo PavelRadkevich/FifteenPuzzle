@@ -14,8 +14,11 @@ public class Fifteens {
     private final int hashCode;
     private int distanceToEnd;
     private int heuristics;
+    private final String solution;
 
-    public Fifteens(int[][] f, int depth) {
+
+    public Fifteens(int[][] f, int depth, String solution) {
+        this.solution = solution;
         fifteens = f;
         this.depth = depth;
         rows = f.length;
@@ -34,13 +37,13 @@ public class Fifteens {
     public ArrayList<Fifteens> getNeighbours() {
         ArrayList<Fifteens> ret = new ArrayList<>();
         if (zeroX != rows - 1)
-            ret.add(new Fifteens(swap(zeroX, zeroY, zeroX + 1, zeroY), depth + 1));
+            ret.add(new Fifteens(swap(zeroX, zeroY, zeroX + 1, zeroY), depth + 1, this.solution + "R"));
         if (zeroX != 0)
-            ret.add(new Fifteens(swap(zeroX, zeroY, zeroX - 1, zeroY), depth + 1));
+            ret.add(new Fifteens(swap(zeroX, zeroY, zeroX - 1, zeroY), depth + 1, this.solution + "L"));
         if (zeroY != columns - 1)
-            ret.add(new Fifteens(swap(zeroX, zeroY, zeroX, zeroY + 1), depth + 1));
+            ret.add(new Fifteens(swap(zeroX, zeroY, zeroX, zeroY + 1), depth + 1, this.solution + "U"));
         if (zeroY != 0)
-            ret.add(new Fifteens(swap(zeroX, zeroY, zeroX, zeroY - 1), depth + 1));
+            ret.add(new Fifteens(swap(zeroX, zeroY, zeroX, zeroY - 1), depth + 1, this.solution + "D"));
         return ret;
     }
     public Fifteens getNeighbour(String direction) {
@@ -67,7 +70,7 @@ public class Fifteens {
                 newFifteen = swap(zeroX, zeroY, zeroX, zeroY - 1);
             }
         }
-        return new Fifteens(newFifteen, depth + 1);
+        return new Fifteens(newFifteen, depth + 1, this.solution + direction);
     }
     private int[][] swap(int x1, int y1, int x2, int y2) {
         int[][] fift = new int[rows][columns];
@@ -100,8 +103,8 @@ public class Fifteens {
         }
         throw new Exception("Can't find number in result matrix");
     }
-    public void solveGame(Algorithm a, String acronym) throws Exception {
-        Fifteens result = a.Solve(this, acronym);
+    public void solveGame(Algorithm a, String[] enter) throws Exception {
+        Fifteens result = a.Solve(this, enter);
         System.out.println(Arrays.deepToString(result.fifteens));
     }
     public int getRows() {
@@ -130,6 +133,10 @@ public class Fifteens {
 
     public void setHeuristics(int heuristics) {
         this.heuristics = heuristics;
+    }
+
+    public String getSolution() {
+        return solution;
     }
 
     @Override

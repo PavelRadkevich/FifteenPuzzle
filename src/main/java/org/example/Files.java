@@ -2,6 +2,8 @@ package org.example;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Scanner;
 
 public class Files {
@@ -18,10 +20,19 @@ public class Files {
                 }
              }
         }
-
-
-
         return fifteen;
+    }
+
+    public static void WriteResultFile(int dzr, String solution, String nameOfFile) {
+        File resultFile = new File(nameOfFile);
+        try(FileWriter writer = new FileWriter(resultFile, false))
+        {
+            writer.write(dzr + "\n" + solution);
+            writer.flush();
+        }
+        catch(IOException ex){
+            throw new RuntimeException(ex);
+        }
     }
 
 }
