@@ -22,4 +22,12 @@ public class AlgorithmsHelper {
         }
         return line;
     }
+
+    public static String[] MirrorAcronym(String[] line) {
+        String[] retline = new String[line.length];
+        for (int i = 0; i < line.length; i++) {
+            retline[i] = line[line.length - i - 1];
+        }
+        return retline;
+    }
 }

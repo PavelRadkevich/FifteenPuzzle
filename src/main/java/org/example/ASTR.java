@@ -12,7 +12,7 @@ public class ASTR implements Algorithm{
     TreeMultimap<Integer, Integer> sortedF = TreeMultimap.create();
     HashMap<Integer, Fifteens> closed = new HashMap<>();
     Fifteens result = null;
-    String heuristics = "";
+    String metric = "";
     @Override
     public Fifteens Solve(Fifteens f, String acronym) throws Exception {
         this.result = AlgorithmsHelper.makeResult(f);
@@ -20,7 +20,7 @@ public class ASTR implements Algorithm{
         if (f.equals(result)) {
             return f;
         }
-        heuristics = acronym;
+        metric = acronym;
         frontier.put(f.getHashCode(), f);
         sortedF.put(0, f.getHashCode());
         while (!frontier.isEmpty()) {
@@ -33,6 +33,7 @@ public class ASTR implements Algorithm{
             frontier.remove(actual.getHashCode(), actual);
             sortedF.remove(actual.getHeuristics(), actual.getHashCode());
             closed.put(actual.getHashCode(), actual);
+            //////////Get neighbour and check result////////
             for (Fifteens neighbour : actual.getNeighbours()) {
                 if (hashResult == actual.getHashCode()) {
                     if (actual.equals(result)) {
@@ -44,8 +45,14 @@ public class ASTR implements Algorithm{
                         continue;
                     }
                 }
-                neighbour.calculateDistance(result);
-                neighbour.setHeuristics(neighbour.getDepth() + neighbour.getDistanceToEnd());
+                //////Calcualte heuristic/////////
+                if (Objects.equals(metric, "manh")) {
+                    neighbour.calculateDistance(result);
+                    neighbour.setHeuristics(neighbour.getDepth() + neighbour.getDistanceToEnd());
+                } else if (Objects.equals(metric, "hamm")){
+                    neighbour.setHeuristics(neighbour.getDepth());
+                }
+                /////////////////Add to the queue/////////////
                 if (!frontier.containsKey(neighbour.getHashCode())) {
                     frontier.put(neighbour.getHashCode(), neighbour);
                     sortedF.put(neighbour.getHeuristics(), neighbour.getHashCode());
