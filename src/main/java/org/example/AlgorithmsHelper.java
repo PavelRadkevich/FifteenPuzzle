@@ -1,6 +1,7 @@
 package org.example;
 
 import static org.example.Files.WriteResultFile;
+import static org.example.Files.WriteStatisticFile;
 
 public class AlgorithmsHelper {
 
@@ -36,6 +37,8 @@ public class AlgorithmsHelper {
 
     public static void Statistics (int DZR, int LSO , int LSP, int MOGR, long CTPO, String Solution, String[] enter) {
         WriteResultFile(DZR, Solution, enter[3]);
+        WriteStatisticFile(DZR, LSO, LSP, MOGR, CTPO, enter[4]);
     }
+
 
 }

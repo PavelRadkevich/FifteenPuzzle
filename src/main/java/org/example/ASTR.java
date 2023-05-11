@@ -14,15 +14,16 @@ public class ASTR implements Algorithm{
     Fifteens result = null;
     String metric = "";
     int MaxDepth = 0;
+    String[] enter;
+    long startTime;
     @Override
     public Fifteens Solve(Fifteens f, String[] enter) throws Exception {
-        long startTime = System.currentTimeMillis();
+        this.enter = enter;
+        startTime = System.nanoTime();
         this.result = AlgorithmsHelper.makeResult(f);
         this.hashResult = result.getHashCode();
         if (f.equals(result)) {
-            AlgorithmsHelper.Statistics(f.getDepth(), frontier.values().toArray().length,
-                    closed.values().toArray().length, MaxDepth, startTime - System.currentTimeMillis(),
-                    f.getSolution(), enter);
+            returnSuccess(f);
             return f;
         }
         metric = enter[1];
@@ -34,7 +35,6 @@ public class ASTR implements Algorithm{
             Set<Fifteens> setFift = frontier.get(firstHeurystyk);
             Iterator<Fifteens> iter = setFift.iterator();
             Fifteens actual = iter.next();
-            //Fifteens actual = frontier.get(sortedF.get(Iterables.getFirst(sortedF.keySet(), null)).first()).iterator().next();
             frontier.remove(actual.getHashCode(), actual);
             sortedF.remove(actual.getHeuristics(), actual.getHashCode());
             closed.put(actual.getHashCode(), actual);
@@ -48,9 +48,7 @@ public class ASTR implements Algorithm{
                 }
                 if (hashResult == neighbour.getHashCode()) {
                     if (neighbour.equals(result)) {
-                        AlgorithmsHelper.Statistics(neighbour.getDepth(), frontier.values().toArray().length,
-                                closed.values().toArray().length, MaxDepth, startTime - System.currentTimeMillis(),
-                                neighbour.getSolution(), enter);
+                        returnSuccess(neighbour);
                         return neighbour;
                     }
                 }
@@ -59,7 +57,8 @@ public class ASTR implements Algorithm{
                     neighbour.calculateDistance(result);
                     neighbour.setHeuristics(neighbour.getDepth() + neighbour.getDistanceToEnd());
                 } else if (Objects.equals(metric, "hamm")){
-                    neighbour.setHeuristics(neighbour.getDepth());
+                    neighbour.calculateDistance(result);
+                    neighbour.setHeuristics(neighbour.getDistanceToEnd());
                 }
                 /////////////////Add to the queue/////////////
                 if (!frontier.containsKey(neighbour.getHashCode())) {
@@ -80,10 +79,19 @@ public class ASTR implements Algorithm{
                 }
             }
         }
-        AlgorithmsHelper.Statistics(-1, frontier.values().toArray().length,
-                closed.values().toArray().length, MaxDepth, startTime - System.currentTimeMillis(),
+        AlgorithmsHelper.Statistics(-1, frontier.values().toArray().length + closed.values().toArray().length,
+                closed.values().toArray().length, MaxDepth, System.nanoTime() - startTime,
                 f.getSolution(), enter);
+        System.out.println("!!!!!!!!!!!FAILURE!!!!!!!!!!!");
         return null;
 
+    }
+
+    public void returnSuccess(Fifteens result) {
+        AlgorithmsHelper.Statistics(result.getDepth(),
+                frontier.values().toArray().length + closed.values().toArray().length,
+                closed.values().toArray().length, MaxDepth, System.nanoTime() - startTime,
+                result.getSolution(), enter);
+        //System.out.println("SUCCESS");
     }
 }

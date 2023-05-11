@@ -14,7 +14,7 @@ public class Fifteens {
     private final int hashCode;
     private int distanceToEnd;
     private int heuristics;
-    private final String solution;
+    private String solution;
 
 
     public Fifteens(int[][] f, int depth, String solution) {
@@ -41,9 +41,9 @@ public class Fifteens {
         if (zeroX != 0)
             ret.add(new Fifteens(swap(zeroX, zeroY, zeroX - 1, zeroY), depth + 1, this.solution + "L"));
         if (zeroY != columns - 1)
-            ret.add(new Fifteens(swap(zeroX, zeroY, zeroX, zeroY + 1), depth + 1, this.solution + "U"));
+            ret.add(new Fifteens(swap(zeroX, zeroY, zeroX, zeroY + 1), depth + 1, this.solution + "D"));
         if (zeroY != 0)
-            ret.add(new Fifteens(swap(zeroX, zeroY, zeroX, zeroY - 1), depth + 1, this.solution + "D"));
+            ret.add(new Fifteens(swap(zeroX, zeroY, zeroX, zeroY - 1), depth + 1, this.solution + "U"));
         return ret;
     }
     public Fifteens getNeighbour(String direction) {
@@ -59,12 +59,12 @@ public class Fifteens {
                     return null;
                 newFifteen = swap(zeroX, zeroY, zeroX - 1, zeroY);
             }
-            case "U" -> {
+            case "D" -> {
                 if (zeroY == columns - 1)
                     return null;
                 newFifteen = swap(zeroX, zeroY, zeroX, zeroY + 1);
             }
-            case "D" -> {
+            case "U" -> {
                 if (zeroY == 0)
                     return null;
                 newFifteen = swap(zeroX, zeroY, zeroX, zeroY - 1);
@@ -105,7 +105,6 @@ public class Fifteens {
     }
     public void solveGame(Algorithm a, String[] enter) throws Exception {
         Fifteens result = a.Solve(this, enter);
-        System.out.println(Arrays.deepToString(result.fifteens));
     }
     public int getRows() {
         return rows;

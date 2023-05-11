@@ -7,21 +7,21 @@ import com.google.common.collect.LinkedHashMultimap;
 public class BFS implements Algorithm {
     int hashResult;
     LinkedHashMultimap<Integer, Fifteens> frontier = LinkedHashMultimap.create();
-    //LinkedHashMap<Integer, Fifteens> frontier = new LinkedHashMap<>();
     HashMap<Integer, Fifteens> closed = new HashMap<>();
     Fifteens result = null;
     String[] line = new String[4];
     int MaxDepth = 0;
+    String[] enter;
+    long startTime;
     @Override
-    public Fifteens Solve(Fifteens f, String[] enter) throws Exception {
-        long startTime = System.currentTimeMillis();
+    public Fifteens Solve(Fifteens f, String[] enter) {
+        this.enter = enter;
+        startTime = System.nanoTime();
         this.result = AlgorithmsHelper.makeResult(f);
         this.hashResult = result.getHashCode();
         ///////////////////////////START////////////////////////////////////////
         if (f.equals(result)) {
-            AlgorithmsHelper.Statistics(f.getDepth(), frontier.values().toArray().length,
-                    closed.values().toArray().length, MaxDepth, startTime - System.currentTimeMillis(),
-                    f.getSolution(), enter);
+            returnSuccess(f);
             return f;
         }
         line = AlgorithmsHelper.DecodeAcronym(enter[1]);
@@ -41,9 +41,7 @@ public class BFS implements Algorithm {
                 if (!closed.containsKey(neighbour.getHashCode())) {
                     if (neighbour.getHashCode() == hashResult) {
                         if (neighbour.equals(result)) {
-                            AlgorithmsHelper.Statistics(neighbour.getDepth(), frontier.values().toArray().length,
-                                    closed.values().toArray().length, MaxDepth, startTime - System.currentTimeMillis(),
-                                    neighbour.getSolution(), enter);
+                            returnSuccess(neighbour);
                             return neighbour;
                         }
                     }
@@ -54,9 +52,7 @@ public class BFS implements Algorithm {
                 } else if (!closed.get(neighbour.getHashCode()).equals(neighbour)) {
                     if (neighbour.getHashCode() == hashResult) {
                         if (neighbour.equals(result)) {
-                            AlgorithmsHelper.Statistics(neighbour.getDepth(), frontier.values().toArray().length,
-                                    closed.values().toArray().length, MaxDepth, startTime - System.currentTimeMillis(),
-                                    neighbour.getSolution(), enter);
+                            returnSuccess(neighbour);
                             return neighbour;
                         }
                     }
@@ -67,9 +63,19 @@ public class BFS implements Algorithm {
                 ////////////////////////////END////////////////////////////////////
             }
         }
-        AlgorithmsHelper.Statistics(-1, frontier.values().toArray().length,
-                closed.values().toArray().length, MaxDepth, startTime - System.currentTimeMillis(),
+        AlgorithmsHelper.Statistics(-1,
+                frontier.values().toArray().length + closed.values().toArray().length,
+                closed.values().toArray().length, MaxDepth, System.nanoTime() - startTime,
                 "", enter);
+        System.out.println("!!!!!!!!!!!FAILURE!!!!!!!!!!!");
         return null;
+    }
+
+    public void returnSuccess(Fifteens result) {
+        AlgorithmsHelper.Statistics(result.getDepth(),
+                frontier.values().toArray().length + closed.values().toArray().length,
+                closed.values().toArray().length, MaxDepth, System.nanoTime() - startTime,
+                result.getSolution(), enter);
+        //System.out.println("SUCCESS");
     }
 }
